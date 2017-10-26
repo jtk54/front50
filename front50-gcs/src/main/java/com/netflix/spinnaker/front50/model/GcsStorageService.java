@@ -40,15 +40,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.FileInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.concurrent.Callable;
 
 import com.netflix.spectator.api.Id;
 import com.netflix.spectator.api.Registry;
 import com.netflix.spectator.api.Timer;
+import com.netflix.spinnaker.front50.model.pipeline.Pipeline;
 import com.netflix.spinnaker.front50.retry.GcsSafeRetry;
 import com.netflix.spinnaker.security.AuthenticatedRequest;
 import groovy.lang.Closure;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -342,9 +345,18 @@ public class GcsStorageService implements StorageService {
 
     String path = keyToPath(objectKey, objectType.group);
     try {
+      if (obj instanceof Pipeline) {
+        Pipeline pip = (Pipeline) obj;
+        log.info(",, pipeline before mapping: {}", pip.toString());
+      }
       byte[] bytes = objectMapper.writeValueAsBytes(obj);
+      log.info(",, pipeline bytes after mapping: {}", new String(bytes));
       StorageObject object = new StorageObject().setBucket(bucketName).setName(path);
       ByteArrayContent content = new ByteArrayContent("application/json", bytes);
+      log.info(",, google byte array content tostring: {}", content.toString());
+      StringWriter sw = new StringWriter();
+      IOUtils.copy(content.getInputStream(), sw);
+      log.info(",, google byte array content inputstream: {}", sw.toString());
       timeExecute(insertTimer, obj_api.insert(bucketName, object, content));
       writeLastModified(objectType.group);
       log.info("Wrote {} '{}'", value("group", objectType.group), value("key", objectKey));
