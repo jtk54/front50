@@ -47,7 +47,9 @@ class PipelineController {
   @RequestMapping(value = '', method = RequestMethod.GET)
   List<Pipeline> list(@RequestParam(required = false, value = 'restricted', defaultValue = 'true') boolean restricted,
                       @RequestParam(required = false, value = 'refresh', defaultValue = 'true') boolean refresh) {
-    pipelineDAO.all(refresh)
+    def derp = pipelineDAO.all(refresh)
+    println ",, pipelines ${derp.find { it.name == 'broken cron' }}"
+    return derp
   }
 
   @PreAuthorize("hasPermission(#application, 'APPLICATION', 'READ')")

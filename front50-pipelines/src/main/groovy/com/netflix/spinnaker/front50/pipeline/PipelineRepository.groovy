@@ -198,6 +198,9 @@ class PipelineRepository implements PipelineDAO {
                     id = row.columns.getColumnByName('id').UUIDValue.toString()
                     String name = row.columns.getColumnByName('name').stringValue
                     def pipeline = mapper.readValue(row.columns.getColumnByName('definition').stringValue, Pipeline)
+                    if (pipeline.name == 'broken cron') {
+                        println ",, sanitized pipeline: ${pipeline}"
+                    }
                     pipeline.id = id
                     pipeline.name = name
                     pipelines.add(pipeline)
