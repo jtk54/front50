@@ -194,7 +194,7 @@ class PipelineController {
         String templateId = source.substring(SPINNAKER_PREFIX.length())
         if (pipeline.getSchema() == "v2") {
           templateId = templateId?.contains("@sha256:") || templateId?.contains(":") ?
-              templateId : "$templateId:latest"
+              templateId : templateId
         }
 
         try {
